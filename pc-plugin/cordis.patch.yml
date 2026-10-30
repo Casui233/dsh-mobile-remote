@@ -1,0 +1,9 @@
+# dsh-mobile-bridge：Desktop 侧的桥接插件。
+# 装进 profile 后由 dsh.profile.bundles 引用生效；配置由插件自己的设置页写
+# $DSH_HOME/mobile-bridge/config.json，这里只放安装时的默认值。
+- insert:
+    - id: mobile-bridge
+      name: '@local/dsh-mobile-bridge'
+      config:
+        enabled: true
+        port: 8765

@@ -1,0 +1,2 @@
+a5521db6c8a18812e5fd29bf2cea70ecb2826ceb6ef9020b90f2d761a4033300  DeepSeek-Harness_3.12-picker.apk
+edf6d8f8751abf680e95f77834a395ba6a7392733ec69294a13fb91b96d8edd3  local-dsh-mobile-bridge-0.1.0.tgz

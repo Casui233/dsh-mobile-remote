@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "手机桥接",
+    "description": "通过 Tailscale 配对手机，在手机上继续同一个 DSH 会话，并把任务结果推送到手机。"
+  }
+}

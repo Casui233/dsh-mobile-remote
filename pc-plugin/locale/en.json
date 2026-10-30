@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Mobile Bridge",
+    "description": "Pair a phone over Tailscale, use the same DSH session from it, and push task notifications."
+  }
+}
