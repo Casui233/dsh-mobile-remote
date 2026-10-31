@@ -21,7 +21,9 @@ node --version          # >= 22
 tailscale ip -4         # 100.x.y.z
 ```
 
-如果 PC 上没有 Tailscale：<https://tailscale.com/download>。手机在应用商店安装 Tailscale，登录同一账号。
+如果 PC 上没有 Tailscale：优先 <https://tailscale.com/download>；如果下载页没反应、或手机没有
+Google Play/GMS，直接用官方静态包索引 <https://pkgs.tailscale.com/stable/>（Android 通用 APK、
+Windows/macOS/Linux 安装包都在里面）。手机安装 Tailscale 后登录同一账号。
 
 > Tailscale 的 Windows/macOS/Linux/Android 安装命令、登录、验证和常见问题见
 > [TAILSCALE.md](TAILSCALE.md)。本项目和 Tailscale 是两层独立授权：Tailscale 负责

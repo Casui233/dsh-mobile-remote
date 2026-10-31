@@ -13,9 +13,11 @@
 
 要求：
 1. 先检查 DSH Desktop、Node 22+、Tailscale、手机系统版本；缺什么先告诉我。
-   - PC 没有 Tailscale：按 docs/TAILSCALE.md 用 winget/brew/install.sh 安装；`tailscale up`
-     的登录 URL 交给我，由我完成账号授权；
-   - 手机 Tailscale 的安装、登录、VPN 授权由我手动完成，到这一步停下来等我。
+   - PC 没有 Tailscale：按 docs/TAILSCALE.md 用 winget/brew/install.sh 安装；不行就从
+     https://pkgs.tailscale.com/stable/ 下载对应安装包；`tailscale up` 的登录 URL 交给我；
+   - 手机没有 Google Play/GMS，或 tailscale.com 的 Download 没反应：用
+     https://pkgs.tailscale.com/stable/ 的 tailscale-android-universal-<版本>.apk
+     （Android 8+，需手动更新）；安装、登录、VPN 授权由我手动完成。
 2. 安装 PC 插件时优先用 plugin_manager install_bundle，target 用仓库 pc-plugin 的绝对路径；
    如果当前 DSH 不支持本地目录，再按 INSTALL.md 的 2B 手动步骤，改 profile 前先备份并退出 DSH。
 3. PC 防火墙只放行 Private/Tailscale 的 TCP 8765，不要暴露公网。
