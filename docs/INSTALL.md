@@ -109,8 +109,8 @@ powershell -ExecutionPolicy Bypass -File .\pc-plugin\scripts\allow-firewall.ps1 
 
 1. 手机安装 Tailscale，登录同一账号，确认 VPN 图标在。
 2. 下载 APK：
-   - GitHub Releases 里的 `DeepSeek-Harness_3.12-picker.apk`；
-   - 或本仓库 `release/DeepSeek-Harness_3.12-picker.apk`。
+   - GitHub Releases 里的 `DeepSeek-Harness_3.19-clipboard3.apk`；
+   - 或本仓库 `release/DeepSeek-Harness_3.19-clipboard3.apk`。
 3. 允许“未知来源”安装。若系统提示与旧版签名冲突，先卸载旧版（会丢 App 私有数据，共享存储 `/storage/emulated/0/DEH` 保留）。
 4. 打开 App → 设置 → 连接方式 → **远程（连电脑）**。
 5. 地址填 PC 设置页显示的 `http://100.x.y.z:8765`；配对码填 6 位数字；点配对。
@@ -146,6 +146,15 @@ App 3.2 起自己订阅 PC 插件配置的 ntfy topic。
 - 原 UI「+ → 文件」不再走系统选择器，而是 App 内文件浏览器，可任意混合格式多选；首次需要「所有文件访问权限」；
 - 悬浮菜单可拖动并吸附到左右边缘，文件传输和扫码都在里面。
 
+## 5.2 分享、剪贴板、多电脑
+
+- **分享到 DSH**：任意 App 分享文本/文件 → 选「发送到 DSH」，内容进入 PC 共享目录 `inbox/`；
+  微信「分享聊天记录」的 zip 会自动解包成实际附件；
+- **剪贴板**：悬浮菜单 → 剪贴板；进入页面只显示手机剪贴板，不自动覆盖；点「从电脑取」才拉取，
+  「发到电脑」写 PC 剪贴板；自动发送仅在本页前台生效；
+- **多电脑**：悬浮菜单 → 切换电脑；配对第二台 PC 后自动保存，切换会重启通知订阅并加载新 PC；
+- **通知快捷动作**：通知展开后有「打开」「稍后 10 分钟」；Android 13+ 需允许通知。
+
 ## 6. 验收清单
 
 - [ ] PC `curl http://127.0.0.1:8765/health` 返回 200
@@ -155,6 +164,11 @@ App 3.2 起自己订阅 PC 插件配置的 ntfy topic。
 - [ ] PC 发送测试，手机收到通知；点通知回 App
 - [ ] 手机锁屏/切后台 10 分钟后再发一条，仍能收到
 - [ ] 不需要 ntfy App
+- [ ] 原 UI 添加文件可混合格式多选
+- [ ] 分享文本/文件到「发送到 DSH」能在 `shared/inbox/` 看到
+- [ ] 剪贴板页「发到电脑」「从电脑取」可用，进入页面不覆盖手机剪贴板
+- [ ] 通知展开有「打开 / 稍后 10 分钟」
+- [ ] 多电脑配对后可切换
 
 ## 7. 故障排查
 

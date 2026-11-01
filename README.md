@@ -23,11 +23,22 @@ PC 事件 → 插件 sendNote() → ntfy.sh/<topic>
 
 通知走公网 ntfy，Tailscale 断开也能收；远程界面和配对需要 Tailscale（或同一局域网直连）。
 
+## 功能
+
+- 手机作为 PC 上 DSH 的第二块屏，会话/任务/审批继续；
+- PC 显示二维码，App 内扫码或系统相机配对；
+- App 自己订阅 ntfy 并弹本地通知，不装 ntfy App；通知可「打开」/「稍后 10 分钟」；
+- 悬浮菜单：文件传输、剪贴板、切换电脑、扫码；
+- PC↔手机共享目录文件传输，手机原 UI 支持任意格式混合多选；
+- 任意 App 分享文本/文件到 `shared/inbox/`，微信聊天记录 zip 自动解包；
+- 多台电脑配对保存与切换；
+- PC↔手机文本剪贴板同步（自动发送只在页面前台）。
+
 ## 当前版本
 
-- App：`3.12-picker`（versionCode 27，minSdk 26 / targetSdk 33）
-- 插件：`@local/dsh-mobile-bridge` 0.1.0
-- 已验证：Android 16 / HyperOS，通知/后台、二维码与 App 内扫码、PC↔手机文件传输、混合格式多选文件
+- App：`3.19-clipboard3`（versionCode 34，minSdk 26 / targetSdk 33）
+- 插件：`@local/dsh-mobile-bridge` 0.1.1
+- 已验证：Android 16 / HyperOS，通知/后台、二维码与 App 内扫码、PC↔手机文件传输、混合格式多选、微信聊天记录解包、通知快捷动作、多电脑切换、文本剪贴板同步
 - 未覆盖：HarmonyOS NEXT（不再兼容 APK）、iOS——需要单独客户端
 
 ## 仓库结构
@@ -55,7 +66,7 @@ release/                   本地构建产物（APK 不提交 git，放 GitHub R
 
 1. PC 和手机登录**同一个 Tailscale 账号**；
 2. PC 安装 `pc-plugin`，在 DSH 设置 → 手机连接里生成配对码；
-3. 手机安装 `release/DeepSeek-Harness_3.12-picker.apk`，远程模式填 PC 的 Tailscale 地址 + 配对码，或用 App 内扫码；
+3. 手机安装 `release/DeepSeek-Harness_3.19-clipboard3.apk`，远程模式填 PC 的 Tailscale 地址 + 配对码，或用 App 内扫码；
 4. PC 通知渠道选 `ntfy` 并填 topic；App 设置 → 通知 显示「接收中」后，发测试通知；
 5. 手机悬浮菜单里打开「文件传输」，在 PC 插件设置里指定共享目录即可双向传文件；原 UI 添加文件走 App 内多选浏览器，支持混合格式。
 

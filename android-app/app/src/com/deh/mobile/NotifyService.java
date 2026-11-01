@@ -402,7 +402,10 @@ public class NotifyService extends Service {
                 .setStyle(new Notification.BigTextStyle().bigText(safeMessage))
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_PRIVATE)
-                .setContentIntent(contentIntent(notificationId));
+                .setContentIntent(contentIntent(notificationId))
+                .addAction(android.R.drawable.ic_menu_view, "打开", contentIntent(notificationId + 1))
+                .addAction(android.R.drawable.ic_menu_recent_history, "稍后 10 分钟",
+                        snoozeIntent(notificationId, safeTitle, safeMessage));
 
         Notification publicVersion = new Notification.Builder(this, CHANNEL_EVENTS)
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
@@ -422,6 +425,46 @@ public class NotifyService extends Service {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(this, requestCode, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    private PendingIntent snoozeIntent(int notificationId, String title, String message) {
+        Intent intent = new Intent(this, NotificationActionReceiver.class);
+        intent.setAction(NotificationActionReceiver.ACTION_SNOOZE);
+        intent.putExtra(NotificationActionReceiver.EXTRA_NOTIFICATION_ID, notificationId);
+        intent.putExtra(NotificationActionReceiver.EXTRA_TITLE, title);
+        intent.putExtra(NotificationActionReceiver.EXTRA_MESSAGE, message);
+        return PendingIntent.getBroadcast(this, notificationId + 200000, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    /** 供“稍后提醒”的 Alarm 广播重新弹通知。 */
+    public static void postSnoozed(Context context, String title, String message) {
+        if (context == null) return;
+        String safeTitle = title == null || title.isEmpty() ? "DSH" : title;
+        String safeMessage = message == null ? "" : message;
+        if (safeMessage.length() > 300) safeMessage = safeMessage.substring(0, 300) + "…";
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null) return;
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_EVENTS, "DSH 任务提醒", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("任务完成、出错、等待批准或回答");
+            manager.createNotificationChannel(channel);
+        }
+        Intent open = new Intent(context, MainActivity.class);
+        open.setAction(Intent.ACTION_VIEW);
+        open.setData(Uri.parse("deh://open"));
+        open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(context, 900000, open,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Notification.Builder builder = new Notification.Builder(context, CHANNEL_EVENTS)
+                .setSmallIcon(android.R.drawable.stat_notify_chat)
+                .setContentTitle(safeTitle)
+                .setContentText(safeMessage)
+                .setStyle(new Notification.BigTextStyle().bigText(safeMessage))
+                .setAutoCancel(true)
+                .setVisibility(Notification.VISIBILITY_PRIVATE)
+                .setContentIntent(pi);
+        manager.notify(80000 + (int) (System.currentTimeMillis() % 10000), builder.build());
     }
 
     private String readAll(InputStream input) throws Exception {

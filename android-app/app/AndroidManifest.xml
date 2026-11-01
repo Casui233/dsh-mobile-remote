@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.deh.mobile"
-    android:versionCode="27"
-    android:versionName="3.12-picker"
+    android:versionCode="34"
+    android:versionName="3.19-clipboard3"
     android:compileSdkVersion="34"
     android:compileSdkVersionCodename="14">
 
@@ -93,6 +93,29 @@
             android:name=".FilePickerActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
+        <activity
+            android:name=".ClipboardActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Black.NoTitleBar" />
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="发送到 DSH"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
         <provider
             android:name=".SimpleFileProvider"
             android:authorities="com.deh.mobile.fileprovider"
@@ -107,6 +130,12 @@
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
         <service
             android:name=".DshService"
+            android:exported="false" />
+        <receiver
+            android:name=".NotificationActionReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".SnoozeReceiver"
             android:exported="false" />
         <service
             android:name=".NotifyService"

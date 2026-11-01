@@ -76,7 +76,7 @@ java -jar "$APKSIGNER_JAR" sign --ks "$KS" --ks-key-alias androiddebugkey --ks-p
   --out "$OUT/signed.apk" "$OUT/aligned.apk"
 
 echo "[8/8] verify + copy"
-cp -f "$OUT/signed.apk" "$DIST/DeepSeek-Harness_3.12-picker_开源干净版.apk"
-java -jar "$APKSIGNER_JAR" verify --verbose "$DIST/DeepSeek-Harness_3.12-picker_开源干净版.apk" | head -6
-ls -lh "$DIST/DeepSeek-Harness_3.12-picker_开源干净版.apk"
+cp -f "$OUT/signed.apk" "$DIST/DeepSeek-Harness_3.19-clipboard3_开源干净版.apk"
+java -jar "$APKSIGNER_JAR" verify --verbose "$DIST/DeepSeek-Harness_3.19-clipboard3_开源干净版.apk" | head -6
+ls -lh "$DIST/DeepSeek-Harness_3.19-clipboard3_开源干净版.apk"
 echo "BUILD OK"

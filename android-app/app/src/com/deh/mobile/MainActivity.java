@@ -629,7 +629,82 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    private void showComputerSwitcher() {
+        final List<Prefs.Profile> profiles = Prefs.profiles(this);
+        if (profiles.isEmpty()) {
+            showRemoteDialog();
+            return;
+        }
+        final String current = Prefs.remoteOrigin(this);
+        String[] labels = new String[profiles.size()];
+        for (int i = 0; i < profiles.size(); i++) {
+            Prefs.Profile profile = profiles.get(i);
+            labels[i] = (profile.origin.equals(current) ? "✓ " : "") + profile.name;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("切换电脑")
+                .setItems(labels, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switchToProfile(profiles.get(which));
+                    }
+                })
+                .setPositiveButton("添加电脑", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showRemoteDialog(true);
+                    }
+                })
+                .setNeutralButton("删除当前", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        confirmDeleteCurrentProfile();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void switchToProfile(final Prefs.Profile profile) {
+        if (profile == null) return;
+        if (profile.origin.equals(Prefs.remoteOrigin(this))) {
+            Toast.makeText(this, "已经在这台电脑上", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Prefs.setRemoteDevice(this, profile.origin, profile.deviceId, profile.token, profile.name);
+        Prefs.setConnMode(this, "remote");
+        NotifyService.stop(this);
+        startNotifyIfPaired();
+        Toast.makeText(this, "切换到 " + profile.name, Toast.LENGTH_SHORT).show();
+        enterRemote();
+    }
+
+    private void confirmDeleteCurrentProfile() {
+        new AlertDialog.Builder(this)
+                .setTitle("删除当前配对")
+                .setMessage("只删除当前这台电脑，其他已配对电脑保留。")
+                .setPositiveButton("删除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Prefs.clearRemote(MainActivity.this);
+                        NotifyService.stop(MainActivity.this);
+                        List<Prefs.Profile> left = Prefs.profiles(MainActivity.this);
+                        if (left.isEmpty()) {
+                            showRemoteDialog(true);
+                        } else {
+                            switchToProfile(left.get(0));
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
     private void showRemoteDialog() {
+        showRemoteDialog(false);
+    }
+
+    private void showRemoteDialog(boolean blankOrigin) {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(8), dp(20), dp(4));
@@ -643,7 +718,7 @@ public class MainActivity extends Activity {
         final android.widget.EditText originInput = new android.widget.EditText(this);
         originInput.setHint("http://192.168.10.101:8765");
         originInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        originInput.setText(Prefs.remoteOrigin(this));
+        originInput.setText(blankOrigin ? "" : Prefs.remoteOrigin(this));
         box.addView(originInput);
         remoteOriginField = originInput;
 
@@ -696,7 +771,6 @@ public class MainActivity extends Activity {
                             return;
                         }
                         Prefs.setConnMode(MainActivity.this, "remote");
-                        Prefs.setRemoteOrigin(MainActivity.this, origin);
                         pairRemote(origin, code);
                     }
                 })
@@ -744,7 +818,7 @@ public class MainActivity extends Activity {
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Prefs.setRemoteDevice(MainActivity.this, useOrigin, deviceId, token, deviceName());
+                                Prefs.setRemoteDevice(MainActivity.this, useOrigin, deviceId, token, Prefs.hostLabel(useOrigin));
                                 if ("ntfy".equals(notifyChannel) && !notifyTopic.isEmpty()) {
                                     Prefs.setNotifyConfig(MainActivity.this, notifyChannel, notifyEndpoint, notifyTopic,
                                             System.currentTimeMillis() / 1000L);
@@ -964,6 +1038,26 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     startActivityForResult(new Intent(MainActivity.this, QrScanActivity.class), REQUEST_SCAN_SIDEBAR);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openComputerSwitcher() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showComputerSwitcher();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openClipboard() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(MainActivity.this, ClipboardActivity.class));
                 }
             });
         }

@@ -15,6 +15,8 @@
       var closeIcon = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
       var folderIcon = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#8ab4f8" d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>';
       var scanIcon = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#8ab4f8" d="M4,4h6v2H6v4H4V4zM14,4h6v6h-2V6h-4V4zM4,14h2v4h4v2H4v-6zM18,14h2v6h-6v-2h4v-4zM4,11h16v2H4z"/></svg>';
+      var switchIcon = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#8ab4f8" d="M4 5h13v10H4zM6 7v6h9V7zM17 8h3v10H7v-2h10V8zM9 17h4v2H9z"/></svg>';
+      var clipIcon = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#8ab4f8" d="M8 4h8v2h3v14H5V6h3zM7 8v10h10V8zM9 10h6v2H9zM9 14h6v2H9z"/></svg>';
 
       var W = function () { return window.innerWidth || 360 };
       var H = function () { return window.innerHeight || 640 };
@@ -50,6 +52,8 @@
       var actions = [];
       if (remote) {
         actions.push({ label: '文件传输', icon: folderIcon, run: function () { location.href = '/files'; } });
+        actions.push({ label: '剪贴板', icon: clipIcon, run: function () { try { window.DSHMobile.openClipboard(); } catch (e) {} } });
+        actions.push({ label: '切换电脑', icon: switchIcon, run: function () { try { window.DSHMobile.openComputerSwitcher(); } catch (e) {} } });
       }
       actions.push({ label: '扫码', icon: scanIcon, run: function () { try { window.DSHMobile.scanPair(); } catch (e) {} } });
 

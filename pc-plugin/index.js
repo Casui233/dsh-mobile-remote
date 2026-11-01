@@ -35,6 +35,7 @@ import {
 } from './lib/core.js'
 import { createDeviceStore, createPairingCodes } from './lib/store.js'
 import { createFileService } from './lib/files.js'
+import { createClipboard } from './lib/clipboard.js'
 import { createProxy, sendJson } from './lib/proxy.js'
 
 export const name = 'mobile-bridge'
@@ -74,6 +75,7 @@ export function apply(ctx, config) {
   const store = createDeviceStore(stateDir, { log })
   const pairing = createPairingCodes()
   const files = createFileService({ getRoot: () => cfg.sharedDir, log })
+  const clipboard = createClipboard()
   /** @type {Map<string, { count: number, resetAt: number }>} */
   const pairAttempts = new Map()
 
@@ -319,6 +321,7 @@ export function apply(ctx, config) {
         service: 'dsh-mobile-bridge',
         version: '0.1.0',
         name: 'DSH Mobile Bridge',
+        features: ['clipboard', 'files'],
       })
       return
     }
@@ -346,6 +349,15 @@ export function apply(ctx, config) {
         return
       }
       sendJson(res, 200, { ok: true, notify: notifyConfigForClient(cfg) })
+      return
+    }
+
+    if (url.pathname === '/clipboard') {
+      if (!authenticateDevice(req)) {
+        sendJson(res, 401, { ok: false, error: 'device not paired' })
+        return
+      }
+      await clipboard.handle(req, res, url)
       return
     }
 

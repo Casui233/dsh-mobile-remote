@@ -1,6 +1,6 @@
 {
   "name": "@local/dsh-mobile-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "把 PC 上的 DSH 通过 Tailscale 安全地借给手机：配对、反向代理、任务推送。",
   "type": "module",

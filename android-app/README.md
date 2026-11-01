@@ -15,6 +15,10 @@ DeepSeek Harness Mobile 把 DeepSeek Harness 的完整 Web UI 搬进 Android 手
 - **远程模式**：不跑本地运行时，直接连电脑上的 DSH（配合 `dsh-mobile-bridge` 插件，Tailscale / 同一 Wi-Fi），电脑上的会话、任务、审批在手机继续
 - **App 内扫码 + 混合格式多选文件**：配对弹窗/网页配对页/侧栏扫码；原 UI 添加文件走 App 内文件浏览器
 - **PC↔手机文件传输**：共享目录上传/下载，内置悬浮菜单入口
+- **分享到 DSH**：任意 App 分享文本/文件到 `shared/inbox/`，微信聊天记录 zip 自动解包
+- **通知快捷动作**：通知上直接「打开」或「稍后 10 分钟」
+- **多电脑切换**：保存多台 PC 的配对，悬浮菜单切换
+- **剪贴板同步**：PC ↔ 手机文本剪贴板，自动发送只在页面前台
 - **App 内置通知订阅**：远程模式直接订阅 PC 插件配置的 ntfy topic，**不需要装 ntfy App**；通知点击回到远程会话
 - 集成 **Shizuku**：让 DSH 里的 agent 获得 shell 权限（截屏、点击、系统命令）
 - 集成 **Dhizuku**：Device Owner 级能力（设备策略、静默安装等）
@@ -31,6 +35,10 @@ DeepSeek Harness Mobile 把 DeepSeek Harness 的完整 Web UI 搬进 Android 手
 | **远程通知** | App 自己订阅 ntfy topic，不装 ntfy App；点通知直接回远程会话 |
 | **文件传输** | 悬浮菜单打开共享目录文件页，手机↔PC 上传/下载 |
 | **混合多选** | App 内文件浏览器，任意格式多选附件 |
+| **分享到 DSH** | 任意 App 分享文本/文件到 `shared/inbox/`；微信聊天记录 zip 自动解包 |
+| **通知快捷动作** | 通知上直接「打开」/「稍后 10 分钟」 |
+| **多电脑** | 保存多台 PC 配对，悬浮菜单切换 |
+| **剪贴板** | 文本 PC↔手机；进入页面不自动覆盖手机剪贴板 |
 | 双工作区 | 内部存储 `/storage/emulated/0/DEH` 或应用私有目录 |
 | Shizuku 权限 | shell 级命令执行（uid=2000），支持 `pm`/`settings`/`dumpsys`/截图/输入 |
 | Dhizuku 权限 | Device Owner 代理授权（通过官方 Dhizuku SDK） |
@@ -83,8 +91,8 @@ build-essential / python3 / git（手机内构建环境）。
 
 ## 版本
 
-- versionCode: `27`
-- versionName: `3.12-picker`
+- versionCode: `34`
+- versionName: `3.19-clipboard3`
 - 包名: `com.deh.mobile`
 - targetSdk 33 / minSdk 26
 

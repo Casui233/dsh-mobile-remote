@@ -17,7 +17,7 @@ https://github.com/Casui233/dsh-mobile-remote
 
 1. 解压 `dsh-mobile-remote-src.zip`；
 2. 在仓库页面 **Add file → Upload files**，把解压后的内容拖进去；
-3. 提交信息：`Initial release: DSH Mobile Remote 3.12-picker`。
+3. 提交信息：`Initial release: DSH Mobile Remote 3.19-clipboard3`。
 
 ### 方式 B：git 命令行
 
@@ -25,7 +25,7 @@ https://github.com/Casui233/dsh-mobile-remote
 cd dsh-mobile-remote
 git init
 git add .
-git commit -m "Initial release: DSH Mobile Remote 3.12-picker"
+git commit -m "Initial release: DSH Mobile Remote 3.19-clipboard3"
 git branch -M main
 git remote add origin https://github.com/Casui233/dsh-mobile-remote.git
 git push -u origin main
@@ -36,12 +36,12 @@ git push -u origin main
 ## 3. 创建 Release
 
 1. 仓库 → **Releases → Draft a new release**；
-2. Tag：`v3.12-picker`；
-3. 标题：`DSH Mobile Remote 3.12-picker`；
+2. Tag：`v3.19-clipboard3`；
+3. 标题：`DSH Mobile Remote 3.19-clipboard3`；
 4. 描述：复制 `release/RELEASE_NOTES.md`；
 5. 上传附件：
-   - `release/DeepSeek-Harness_3.12-picker.apk`
-   - `release/local-dsh-mobile-bridge-0.1.0.tgz`
+   - `release/DeepSeek-Harness_3.19-clipboard3.apk`
+   - `release/local-dsh-mobile-bridge-0.1.1.tgz`
    - `release/SHA256SUMS.txt`
 6. 发布。
 
@@ -70,7 +70,7 @@ agent 会按文档逐步检查/安装。
 
 ## 6. 可选：npm 包
 
-`pc-plugin` 已能 `npm pack` 成 `local-dsh-mobile-bridge-0.1.0.tgz`。如果要让用户
+`pc-plugin` 已能 `npm pack` 成 `local-dsh-mobile-bridge-0.1.1.tgz`。如果要让用户
 一行安装，可以把它发布到 npm（需要 npm 账号）后再把 `plugin_manager install_bundle`
 的 target 改成包名；当前文档以本地目录 + Release tarball 为准。
 

@@ -3,6 +3,12 @@ package com.deh.mobile;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /** 轻量偏好设置：工作区根、桌面视图。 */
 public final class Prefs {
     private static final String FILE = "dsh_mobile";
@@ -91,16 +97,82 @@ public final class Prefs {
     }
 
     public static void setRemoteDevice(Context context, String origin, String deviceId, String token, String name) {
+        String safeName = name == null || name.trim().isEmpty() ? hostLabel(origin) : name.trim();
         sp(context).edit()
                 .putString("remote_origin", origin)
                 .putString("remote_device_id", deviceId)
                 .putString("remote_token", token)
-                .putString("remote_name", name)
+                .putString("remote_name", safeName)
                 .apply();
+        upsertProfile(context, origin, deviceId, token, safeName);
     }
 
-    /** 解除配对：清远程凭证和通知订阅，本地运行时配置不动。 */
+    /** 已配对电脑列表（最近使用的在前）；旧版本只有单台时自动迁移。 */
+    public static List<Profile> profiles(Context context) {
+        List<Profile> result = new ArrayList<>();
+        SharedPreferences preferences = sp(context);
+        try {
+            String raw = preferences.getString("remote_profiles", "[]");
+            JSONArray array = new JSONArray(raw == null ? "[]" : raw);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.optJSONObject(i);
+                if (item == null) continue;
+                String origin = item.optString("origin", "");
+                String token = item.optString("token", "");
+                if (origin.isEmpty() || token.isEmpty()) continue;
+                String name = item.optString("name", "");
+                if (name.isEmpty()) name = hostLabel(origin);
+                result.add(new Profile(origin, item.optString("deviceId", ""), token, name));
+            }
+        } catch (Throwable ignored) {
+        }
+        if (result.isEmpty()) {
+            String origin = preferences.getString("remote_origin", "");
+            String token = preferences.getString("remote_token", "");
+            if (!origin.isEmpty() && !token.isEmpty()) {
+                String name = preferences.getString("remote_name", "");
+                result.add(new Profile(origin, preferences.getString("remote_device_id", ""), token,
+                        name == null || name.isEmpty() ? hostLabel(origin) : name));
+            }
+        }
+        return result;
+    }
+
+    private static void upsertProfile(Context context, String origin, String deviceId, String token, String name) {
+        List<Profile> list = profiles(context);
+        List<Profile> next = new ArrayList<>();
+        next.add(new Profile(origin, deviceId == null ? "" : deviceId, token, name));
+        for (Profile profile : list) {
+            if (!profile.origin.equals(origin)) next.add(profile);
+        }
+        writeProfiles(context, next);
+    }
+
+    private static void writeProfiles(Context context, List<Profile> profiles) {
+        JSONArray array = new JSONArray();
+        for (Profile profile : profiles) {
+            try {
+                JSONObject item = new JSONObject();
+                item.put("origin", profile.origin);
+                item.put("deviceId", profile.deviceId);
+                item.put("token", profile.token);
+                item.put("name", profile.name);
+                array.put(item);
+            } catch (Throwable ignored) {
+            }
+        }
+        sp(context).edit().putString("remote_profiles", array.toString()).apply();
+    }
+
+    /** 解除当前配对：只删当前电脑，保留其他已配对电脑。 */
     public static void clearRemote(Context context) {
+        String origin = sp(context).getString("remote_origin", "");
+        List<Profile> list = profiles(context);
+        List<Profile> next = new ArrayList<>();
+        for (Profile profile : list) {
+            if (!profile.origin.equals(origin)) next.add(profile);
+        }
+        writeProfiles(context, next);
         sp(context).edit()
                 .remove("remote_origin")
                 .remove("remote_device_id")
@@ -112,6 +184,28 @@ public final class Prefs {
                 .remove("notify_since")
                 .remove("notify_last_id")
                 .apply();
+    }
+
+    public static String hostLabel(String origin) {
+        if (origin == null) return "DSH";
+        String value = origin.replaceFirst("^https?://", "");
+        int slash = value.indexOf('/');
+        if (slash >= 0) value = value.substring(0, slash);
+        return value.isEmpty() ? "DSH" : value;
+    }
+
+    public static final class Profile {
+        public final String origin;
+        public final String deviceId;
+        public final String token;
+        public final String name;
+
+        public Profile(String origin, String deviceId, String token, String name) {
+            this.origin = origin;
+            this.deviceId = deviceId;
+            this.token = token;
+            this.name = name;
+        }
     }
 
     // ── 通知订阅（App 直接订阅 ntfy，不依赖 ntfy App） ─────────────────────
