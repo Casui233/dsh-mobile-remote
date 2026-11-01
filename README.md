@@ -60,7 +60,7 @@ release/                   本地构建产物（APK 不提交 git，放 GitHub R
 
 完整步骤见 [docs/INSTALL.md](docs/INSTALL.md)。
 
-如果是在一个**新的 DSH 会话**里，直接把 [docs/INSTALL-PROMPT.md](docs/INSTALL-PROMPT.md) 的内容发给 agent，并把其中的 `Casui233/dsh-mobile-remote` 换成实际仓库地址；agent 会按步骤检查环境、安装 PC 插件、Tailscale 和手机 APK，并逐项验证。
+如果是在一个**新的 DSH 会话**里，直接把 [docs/INSTALL-PROMPT.md](docs/INSTALL-PROMPT.md) 的内容发给 agent（已指向本仓库 `Casui233/dsh-mobile-remote`）；agent 会按步骤检查环境、安装 PC 插件、Tailscale 和手机 APK，并逐项验证。
 
 最少需要：
 

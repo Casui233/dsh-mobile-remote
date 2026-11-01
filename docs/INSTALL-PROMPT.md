@@ -1,6 +1,6 @@
 # 新 DSH 会话一键安装提示词
 
-把下面整段复制到一个新的 DSH 会话（把 `Casui233/dsh-mobile-remote` 换成实际 GitHub 仓库）：
+把下面整段复制到一个新的 DSH 会话：
 
 ```text
 请按 https://raw.githubusercontent.com/Casui233/dsh-mobile-remote/main/docs/INSTALL.md
@@ -33,6 +33,6 @@
 ## 使用说明
 
 - 这份提示词不包含任何密钥；配对码在 PC 设置页临时生成。
-- 如果仓库还没发布，把 `Casui233/dsh-mobile-remote` 换成本地路径，或先把 `docs/INSTALL.md` 的内容直接贴给 agent。
+- 如果仓库地址变化，把提示词里的 raw URL 换成新地址。
 - 手机上安装 APK、登录 Tailscale、允许未知来源，必须由使用者本人操作。
 - 安装完成后建议把手机 App 的省电策略设为“无限制”，否则部分国产 ROM 会杀通知服务。
