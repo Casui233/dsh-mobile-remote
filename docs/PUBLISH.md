@@ -17,7 +17,7 @@ https://github.com/Casui233/dsh-mobile-remote
 
 1. 解压 `dsh-mobile-remote-src.zip`；
 2. 在仓库页面 **Add file → Upload files**，把解压后的内容拖进去；
-3. 提交信息：`Initial release: DSH Mobile Remote 3.19-clipboard3`。
+3. 提交信息：`Initial release: DSH Mobile Remote 3.21-actionsfix`。
 
 ### 方式 B：git 命令行
 
@@ -25,7 +25,7 @@ https://github.com/Casui233/dsh-mobile-remote
 cd dsh-mobile-remote
 git init
 git add .
-git commit -m "Initial release: DSH Mobile Remote 3.19-clipboard3"
+git commit -m "Initial release: DSH Mobile Remote 3.21-actionsfix"
 git branch -M main
 git remote add origin https://github.com/Casui233/dsh-mobile-remote.git
 git push -u origin main
@@ -36,11 +36,11 @@ git push -u origin main
 ## 3. 创建 Release
 
 1. 仓库 → **Releases → Draft a new release**；
-2. Tag：`v3.19-clipboard3`；
-3. 标题：`DSH Mobile Remote 3.19-clipboard3`；
+2. Tag：`v3.21-actionsfix`；
+3. 标题：`DSH Mobile Remote 3.21-actionsfix`；
 4. 描述：复制 `release/RELEASE_NOTES.md`；
 5. 上传附件：
-   - `release/DeepSeek-Harness_3.19-clipboard3.apk`
+   - `release/DeepSeek-Harness_3.21-actionsfix.apk`
    - `release/local-dsh-mobile-bridge-0.1.1.tgz`
    - `release/SHA256SUMS.txt`
 6. 发布。

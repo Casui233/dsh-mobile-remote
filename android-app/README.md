@@ -39,6 +39,8 @@ DeepSeek Harness Mobile 把 DeepSeek Harness 的完整 Web UI 搬进 Android 手
 | **通知快捷动作** | 通知上直接「打开」/「稍后 10 分钟」 |
 | **多电脑** | 保存多台 PC 配对，悬浮菜单切换 |
 | **剪贴板** | 文本 PC↔手机；进入页面不自动覆盖手机剪贴板 |
+| **审批直通** | 通知上「批准 / 拒绝」，和 PC UI 竞速；点完自动收起 |
+| **提问直通** | 通知上「回答」，App 内选选项/自由输入，回传结构化答案 |
 | 双工作区 | 内部存储 `/storage/emulated/0/DEH` 或应用私有目录 |
 | Shizuku 权限 | shell 级命令执行（uid=2000），支持 `pm`/`settings`/`dumpsys`/截图/输入 |
 | Dhizuku 权限 | Device Owner 代理授权（通过官方 Dhizuku SDK） |
@@ -91,8 +93,8 @@ build-essential / python3 / git（手机内构建环境）。
 
 ## 版本
 
-- versionCode: `34`
-- versionName: `3.19-clipboard3`
+- versionCode: `36`
+- versionName: `3.21-actionsfix`
 - 包名: `com.deh.mobile`
 - targetSdk 33 / minSdk 26
 

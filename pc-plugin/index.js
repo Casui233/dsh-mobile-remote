@@ -36,6 +36,7 @@ import {
 import { createDeviceStore, createPairingCodes } from './lib/store.js'
 import { createFileService } from './lib/files.js'
 import { createClipboard } from './lib/clipboard.js'
+import { createRemoteActions } from './lib/remote-actions.js'
 import { createProxy, sendJson } from './lib/proxy.js'
 
 export const name = 'mobile-bridge'
@@ -76,6 +77,7 @@ export function apply(ctx, config) {
   const pairing = createPairingCodes()
   const files = createFileService({ getRoot: () => cfg.sharedDir, log })
   const clipboard = createClipboard()
+  const remoteActions = createRemoteActions({ ttlMs: 120000 })
   /** @type {Map<string, { count: number, resetAt: number }>} */
   const pairAttempts = new Map()
 
@@ -319,9 +321,9 @@ export function apply(ctx, config) {
       sendJson(res, 200, {
         ok: true,
         service: 'dsh-mobile-bridge',
-        version: '0.1.0',
+        version: '0.1.1',
         name: 'DSH Mobile Bridge',
-        features: ['clipboard', 'files'],
+        features: ['clipboard', 'files', 'remote-actions'],
       })
       return
     }
@@ -349,6 +351,15 @@ export function apply(ctx, config) {
         return
       }
       sendJson(res, 200, { ok: true, notify: notifyConfigForClient(cfg) })
+      return
+    }
+
+    if (url.pathname === '/remote-action') {
+      if (!authenticateDevice(req)) {
+        sendJson(res, 401, { ok: false, error: 'device not paired' })
+        return
+      }
+      await remoteActions.handle(req, res, url)
       return
     }
 
@@ -672,6 +683,67 @@ export function apply(ctx, config) {
     return [dir, short ? `会话 ${short}` : ''].filter(Boolean).join(' · ') || 'DSH 会话'
   }
 
+  const NEVER = new Promise(() => {})
+
+  function questionPayload(request) {
+    return (request?.questions || []).map((question) => ({
+      id: String(question?.id || ''),
+      header: String(question?.header || ''),
+      question: String(question?.question || ''),
+      multiSelect: Boolean(question?.multiSelect),
+      options: (question?.options || []).map((option) => ({
+        label: String(option?.label || ''),
+        description: option?.description ? String(option.description) : '',
+      })),
+    }))
+  }
+
+  async function raceRemoteAction(kind, next, note, payload, actions) {
+    const uiRaw = Promise.resolve().then(() => (typeof next === 'function' ? next() : 'unavailable'))
+    let uiUnavailable = false
+    let uiError = null
+    const ui = uiRaw.then((value) => {
+      if (kind === 'approval' && value === 'unavailable') {
+        uiUnavailable = true
+        return NEVER
+      }
+      return value
+    }).catch((error) => {
+      uiError = error
+      if (kind === 'question') uiUnavailable = true
+      return NEVER
+    })
+
+    const action = remoteActions.create(kind, payload)
+    const sent = await sendNote({ ...note, actions: actions(action.token) })
+    if (!sent?.ok) {
+      remoteActions.cancel(action.token)
+      return await uiRaw
+    }
+
+    const timeout = new Promise((resolve) => {
+      const timer = setTimeout(() => resolve({ source: 'timeout' }), 120000)
+      timer.unref?.()
+    })
+    const winner = await Promise.race([
+      ui.then((value) => ({ source: 'ui', value })),
+      action.promise.then((value) => ({ source: 'remote', value })),
+      timeout,
+    ])
+    if (winner.source === 'remote') return winner.value
+    if (winner.source === 'ui') {
+      remoteActions.cancel(action.token)
+      return winner.value
+    }
+    remoteActions.cancel(action.token)
+    if (uiError) throw uiError
+    if (uiUnavailable) {
+      if (kind === 'approval') return 'unavailable'
+      throw new Error('no user-questions answerer')
+    }
+    return await ui
+  }
+
   function registerEventListeners() {
     const disposers = []
 
@@ -715,17 +787,24 @@ export function apply(ctx, config) {
 
     disposers.push(ctx.on('approval/request', (request, next) => {
       try {
-        if (cfg.notifyApproval) {
-          const reason = request?.displayReason?.zh
-            || request?.displayReason?.en
-            || request?.reason
-            || request?.toolName
-          void sendNote({
-            title: '需要你批准',
-            body: [sessionLabel(request?.agent?.id), reason].filter(Boolean).join('\n'),
-            click: publicOrigin() || undefined,
-          })
+        if (!cfg.notifyApproval) return typeof next === 'function' ? next() : undefined
+        const reason = request?.displayReason?.zh
+          || request?.displayReason?.en
+          || request?.reason
+          || request?.toolName
+        const body = [sessionLabel(request?.agent?.id), reason].filter(Boolean).join('\n')
+        const note = {
+          title: '需要你批准',
+          body,
+          click: publicOrigin() || undefined,
         }
+        if (cfg.notifyChannel === 'ntfy') {
+          return raceRemoteAction('approval', next, note, { title: note.title, body }, (token) => [
+            { action: 'view', label: '批准', url: `deh://remote-approval?token=${token}&outcome=allowed-once`, clear: true },
+            { action: 'view', label: '拒绝', url: `deh://remote-approval?token=${token}&outcome=rejected`, clear: true },
+          ])
+        }
+        void sendNote(note)
       } catch (error) {
         log(`审批通知失败：${error?.message ?? error}`)
       }
@@ -734,15 +813,24 @@ export function apply(ctx, config) {
 
     disposers.push(ctx.on('user-questions/request', (request, next) => {
       try {
-        if (cfg.notifyQuestion) {
-          const first = request?.questions?.[0]
-          const text = [first?.header, first?.question].filter(Boolean).join('：') || '需要你回答一个问题'
-          void sendNote({
-            title: '需要你回答',
-            body: [sessionLabel(request?.agent?.id), text.slice(0, 200)].filter(Boolean).join('\n'),
-            click: publicOrigin() || undefined,
-          })
+        if (!cfg.notifyQuestion) return typeof next === 'function' ? next() : undefined
+        const first = request?.questions?.[0]
+        const text = [first?.header, first?.question].filter(Boolean).join('：') || '需要你回答一个问题'
+        const body = [sessionLabel(request?.agent?.id), text.slice(0, 200)].filter(Boolean).join('\n')
+        const note = {
+          title: '需要你回答',
+          body,
+          click: publicOrigin() || undefined,
         }
+        if (cfg.notifyChannel === 'ntfy') {
+          const questions = questionPayload(request)
+          return raceRemoteAction('question', next, note,
+            { title: note.title, body, questions },
+            (token) => [
+              { action: 'view', label: '回答', url: `deh://remote-question?token=${token}`, clear: true },
+            ])
+        }
+        void sendNote(note)
       } catch (error) {
         log(`提问通知失败：${error?.message ?? error}`)
       }

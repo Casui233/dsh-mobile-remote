@@ -72,7 +72,7 @@ bash scripts/build.sh
 
 ## 版本策略
 
-- `versionCode` / `versionName` 固定（当前 34 / 3.19-clipboard3），更新内容写在**文件名**里。
+- `versionCode` / `versionName` 固定（当前 36 / 3.21-actionsfix），更新内容写在**文件名**里。
 - 覆盖安装：同 versionCode + 同签名 → 数据保留。
 
 ## 注意

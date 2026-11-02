@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -354,7 +355,8 @@ public class NotifyService extends Service {
             String title = json.optString("title", "DSH");
             String message = json.optString("message", "");
             if (message.isEmpty()) message = title;
-            postEvent(id, title, message);
+            JSONArray actions = json.optJSONArray("actions");
+            postEvent(id, title, message, actions);
             if (!id.isEmpty()) Prefs.setNotifyLastId(this, id);
         } catch (Throwable t) {
             Log.w(TAG, "忽略无法解析的 ntfy 消息：" + t);
@@ -387,7 +389,7 @@ public class NotifyService extends Service {
         return builder.build();
     }
 
-    private void postEvent(String messageId, String title, String message) {
+    private void postEvent(String messageId, String title, String message, JSONArray actions) {
         String safeTitle = title == null || title.isEmpty() ? "DSH" : title;
         String safeMessage = message == null ? "" : message;
         if (safeMessage.length() > 300) safeMessage = safeMessage.substring(0, 300) + "…";
@@ -402,10 +404,16 @@ public class NotifyService extends Service {
                 .setStyle(new Notification.BigTextStyle().bigText(safeMessage))
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_PRIVATE)
-                .setContentIntent(contentIntent(notificationId))
-                .addAction(android.R.drawable.ic_menu_view, "打开", contentIntent(notificationId + 1))
-                .addAction(android.R.drawable.ic_menu_recent_history, "稍后 10 分钟",
-                        snoozeIntent(notificationId, safeTitle, safeMessage));
+                .setContentIntent(contentIntent(notificationId));
+
+        int customCount = addRemoteActions(builder, actions, notificationId);
+        if (customCount == 0) {
+            builder.addAction(android.R.drawable.ic_menu_view, "打开", contentIntent(notificationId + 1));
+        }
+        if (customCount < 2) {
+            builder.addAction(android.R.drawable.ic_menu_recent_history, "稍后 10 分钟",
+                    snoozeIntent(notificationId, safeTitle, safeMessage));
+        }
 
         Notification publicVersion = new Notification.Builder(this, CHANNEL_EVENTS)
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
@@ -416,6 +424,28 @@ public class NotifyService extends Service {
 
         NotificationManager manager = getSystemService(NotificationManager.class);
         if (manager != null) manager.notify(notificationId, builder.build());
+    }
+
+    private int addRemoteActions(Notification.Builder builder, JSONArray actions, int notificationId) {
+        if (actions == null) return 0;
+        int count = 0;
+        for (int i = 0; i < actions.length() && count < 3; i++) {
+            JSONObject item = actions.optJSONObject(i);
+            if (item == null) continue;
+            if (!"view".equals(item.optString("action", ""))) continue;
+            String label = item.optString("label", "");
+            String url = item.optString("url", "");
+            if (label.isEmpty() || !url.startsWith("deh://")) continue;
+            Intent intent = new Intent(this, RemoteActionActivity.class);
+            intent.setData(Uri.parse(url));
+            intent.putExtra(RemoteActionActivity.EXTRA_NOTIFICATION_ID, notificationId);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pending = PendingIntent.getActivity(this, notificationId + 300 + count, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            builder.addAction(android.R.drawable.ic_menu_view, label, pending);
+            count++;
+        }
+        return count;
     }
 
     private PendingIntent contentIntent(int requestCode) {

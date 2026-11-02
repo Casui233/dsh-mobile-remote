@@ -1,2 +1,2 @@
-265c0b6530e82853daa7f17ba9385a093ed4d5ff821eaeb98bd1ab34d3360906  DeepSeek-Harness_3.19-clipboard3.apk
-b21dea4c9c6c6b3323908bd08f9635f5fae69f7e63237d2dbd4a031b181d90cc  local-dsh-mobile-bridge-0.1.1.tgz
+3105dcb1f61816df80a191d819ea9e33b0415faa6364de8a355b9bfd6fbf3b67  DeepSeek-Harness_3.21-actionsfix.apk
+f5266d9cea06c03cdb9e93c8e961586d504da553edc1415ddce8265fb2a31315  local-dsh-mobile-bridge-0.1.1.tgz

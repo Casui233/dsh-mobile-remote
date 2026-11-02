@@ -109,8 +109,8 @@ powershell -ExecutionPolicy Bypass -File .\pc-plugin\scripts\allow-firewall.ps1 
 
 1. 手机安装 Tailscale，登录同一账号，确认 VPN 图标在。
 2. 下载 APK：
-   - GitHub Releases 里的 `DeepSeek-Harness_3.19-clipboard3.apk`；
-   - 或本仓库 `release/DeepSeek-Harness_3.19-clipboard3.apk`。
+   - GitHub Releases 里的 `DeepSeek-Harness_3.21-actionsfix.apk`；
+   - 或本仓库 `release/DeepSeek-Harness_3.21-actionsfix.apk`。
 3. 允许“未知来源”安装。若系统提示与旧版签名冲突，先卸载旧版（会丢 App 私有数据，共享存储 `/storage/emulated/0/DEH` 保留）。
 4. 打开 App → 设置 → 连接方式 → **远程（连电脑）**。
 5. 地址填 PC 设置页显示的 `http://100.x.y.z:8765`；配对码填 6 位数字；点配对。
@@ -153,6 +153,7 @@ App 3.2 起自己订阅 PC 插件配置的 ntfy topic。
 - **剪贴板**：悬浮菜单 → 剪贴板；进入页面只显示手机剪贴板，不自动覆盖；点「从电脑取」才拉取，
   「发到电脑」写 PC 剪贴板；自动发送仅在本页前台生效；
 - **多电脑**：悬浮菜单 → 切换电脑；配对第二台 PC 后自动保存，切换会重启通知订阅并加载新 PC；
+- **审批/提问直通**：审批通知直接「批准/拒绝」，提问通知「回答」打开手机回答页；动作 token 2 分钟有效，点完通知自动收起；
 - **通知快捷动作**：通知展开后有「打开」「稍后 10 分钟」；Android 13+ 需允许通知。
 
 ## 6. 验收清单
@@ -168,6 +169,7 @@ App 3.2 起自己订阅 PC 插件配置的 ntfy topic。
 - [ ] 分享文本/文件到「发送到 DSH」能在 `shared/inbox/` 看到
 - [ ] 剪贴板页「发到电脑」「从电脑取」可用，进入页面不覆盖手机剪贴板
 - [ ] 通知展开有「打开 / 稍后 10 分钟」
+- [ ] 审批通知「批准/拒绝」、提问通知「回答」可用，点完通知收起
 - [ ] 多电脑配对后可切换
 
 ## 7. 故障排查

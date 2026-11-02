@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.deh.mobile"
-    android:versionCode="34"
-    android:versionName="3.19-clipboard3"
+    android:versionCode="36"
+    android:versionName="3.21-actionsfix"
     android:compileSdkVersion="34"
     android:compileSdkVersionCodename="14">
 
@@ -95,6 +95,14 @@
             android:theme="@android:style/Theme.Black.NoTitleBar" />
         <activity
             android:name=".ClipboardActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Black.NoTitleBar" />
+        <activity
+            android:name=".RemoteActionActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".QuestionAnswerActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Black.NoTitleBar" />
         <activity

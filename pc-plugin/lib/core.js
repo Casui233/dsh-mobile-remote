@@ -291,7 +291,7 @@ export function isQuietRange(range) {
  * 所有渠道都用 JSON body，避免把中文塞进 HTTP 头（Node 会拒绝非 Latin-1 头）。
  *
  * @param {typeof DEFAULTS} cfg
- * @param {{ title: string, body: string, click?: string, quiet?: boolean }} note
+ * @param {{ title: string, body: string, click?: string, quiet?: boolean, actions?: Array<{action:string,label:string,url:string,clear?:boolean}> }} note
  * @returns {{ channel: string, url: string, init: RequestInit, redactedUrl: string } | null}
  */
 export function buildNotifyRequest(cfg, note) {
@@ -314,6 +314,17 @@ export function buildNotifyRequest(cfg, note) {
       tags: ['robot'],
     }
     if (click) payload.click = click
+    if (Array.isArray(note.actions) && note.actions.length > 0) {
+      payload.actions = note.actions
+        .filter((item) => item && item.action === 'view' && item.label && item.url)
+        .slice(0, 3)
+        .map((item) => ({
+          action: 'view',
+          label: String(item.label),
+          url: String(item.url),
+          clear: item.clear !== false,
+        }))
+    }
     return {
       channel,
       url: base,
